@@ -4,45 +4,48 @@
 const ConvertHandler = require('../controllers/convertHandler.js');
 
 module.exports = function (app) {
-
   let convertHandler = new ConvertHandler();
 
   app.route('/api/convert')
     .get(function (req, res) {
       let input = req.query.input;
-      if (!input) {
-        // FCC attend probablement une chaîne simple ici, basée sur l'exigence 7
-        // return res.json({ error: 'invalid unit' });
-        return res.type('text').send('invalid unit'); // Ou juste res.send('invalid unit');
+
+      // Gérer le cas où 'input' est absent ou vide
+      // FreeCodeCamp teste probablement cela.
+      if (input === undefined || input === null || String(input).trim() === '') {
+        // Selon l'exigence 7, si l'unité n'est pas valide (ce qui est le cas si l'input est vide),
+        // renvoyer 'invalid unit'.
+        return res.status(200).type('text').send('invalid unit');
       }
 
       let initNum = convertHandler.getNum(input);
-      let initUnit = convertHandler.getUnit(input);
+      let initUnit = convertHandler.getUnit(input); // Rappel : getUnit renvoie 'L' pour litre
 
-      // L'ordre des vérifications est important
+      // L'ordre des vérifications est important pour correspondre aux messages d'erreur spécifiques.
       if (initNum === null && initUnit === null) {
-        // return res.json({ error: 'invalid number and unit' });
-        return res.type('text').send('invalid number and unit'); // Exigence 9
+        // Exigence 9
+        return res.status(200).type('text').send('invalid number and unit');
       }
       if (initNum === null) {
-        // return res.json({ error: 'invalid number' });
-        return res.type('text').send('invalid number'); // Exigence 8
+        // Exigence 8
+        return res.status(200).type('text').send('invalid number');
       }
       if (initUnit === null) {
-        // return res.json({ error: 'invalid unit' });
-        return res.type('text').send('invalid unit'); // Exigence 7
+        // Exigence 7
+        return res.status(200).type('text').send('invalid unit');
       }
 
-      // Si tout est valide, on continue avec la réponse JSON
+      // Si toutes les validations d'entrée sont passées, procéder à la conversion
       let returnNum = convertHandler.convert(initNum, initUnit);
       let returnUnit = convertHandler.getReturnUnit(initUnit);
       let toString = convertHandler.getString(initNum, initUnit, returnNum, returnUnit);
 
-      res.json({
+      // Construction de la réponse JSON pour une conversion réussie
+      res.status(200).json({
         initNum: initNum,
-        initUnit: initUnit,
+        initUnit: initUnit, // Doit être en minuscule, sauf 'L'
         returnNum: returnNum,
-        returnUnit: returnUnit,
+        returnUnit: returnUnit, // Doit être en minuscule, sauf 'L'
         string: toString
       });
     });
