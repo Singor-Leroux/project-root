@@ -74,15 +74,6 @@ if (initNum === 'invalid number' && initUnit === 'invalid unit') {
   return { error: 'invalid unit' };
 }
 
-
-  if (numberError && unitError) {
-    return { error: 'invalid number and unit' };
-  } else if (numberError) {
-    return { error: 'invalid number' };
-  } else if (unitError) {
-    return { error: 'invalid unit' };
-  }
-
   const returnNum = roundNum(convert(initNum, initUnit));
   const returnUnit = getReturnUnit(initUnit);
   const initUnitString = spellOutUnit(initUnit);
