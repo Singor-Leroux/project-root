@@ -10,38 +10,39 @@ const CONVERSIONS = {
 const validUnits = ['gal', 'L', 'lbs', 'kg', 'mi', 'km'];
 
 function parseNumber(input) {
-  // Récupère la partie nombre (avant la première lettre)
-  let numStr = input.match(/^[\d/.]+/)?.[0];
-  if (!numStr) return 1; // Si pas de nombre donné, par défaut 1
+  const result = input.match(/^[\d/.]+/);
+  if (!result) return 1;
 
-  // Vérifie s'il y a plusieurs '/'
-  if ((numStr.match(/\//g) || []).length > 1) return null;
+  const numStr = result[0];
+  const slashCount = (numStr.match(/\//g) || []).length;
 
-  if (numStr.includes('/')) {
-    // Fraction
-    const numbers = numStr.split('/');
-    if (numbers.length !== 2) return null;
-    const [numerator, denominator] = numbers;
-    if (isNaN(numerator) || isNaN(denominator)) return null;
-    return parseFloat(numerator) / parseFloat(denominator);
-  } else {
-    // Décimal ou entier
-    const parsed = parseFloat(numStr);
-    if (isNaN(parsed)) return null;
-    return parsed;
+  if (slashCount > 1) return 'invalid number';
+
+  if (slashCount === 1) {
+    const [numerator, denominator] = numStr.split('/');
+    const num = parseFloat(numerator);
+    const den = parseFloat(denominator);
+    if (isNaN(num) || isNaN(den)) return 'invalid number';
+    return num / den;
   }
+
+  const num = parseFloat(numStr);
+  return isNaN(num) ? 'invalid number' : num;
 }
+
 
 function parseUnit(input) {
   const unitMatch = input.match(/[a-zA-Z]+$/);
-  if (!unitMatch) return null;
-  let unit = unitMatch[0];
-  if (unit.toLowerCase() === 'l') unit = 'L'; // Majuscule litre
-  else unit = unit.toLowerCase();
+  if (!unitMatch) return 'invalid unit';
 
-  if (!validUnits.includes(unit)) return null;
-  return unit;
+  const unit = unitMatch[0].toLowerCase();
+  const validUnits = ['gal', 'l', 'mi', 'km', 'lbs', 'kg'];
+
+  if (!validUnits.includes(unit)) return 'invalid unit';
+
+  return unit === 'l' ? 'L' : unit;
 }
+
 
 function spellOutUnit(unit) {
   return CONVERSIONS[unit].spelledOut;
@@ -61,7 +62,7 @@ function roundNum(num) {
   return Math.round(num * 100000) / 100000;
 }
 
-function convert(input) {
+function convertNew(input) {
   const initNum = parseNumber(input);
   const initUnit = parseUnit(input);
 
@@ -91,5 +92,9 @@ function convert(input) {
 }
 
 module.exports = {
+  parseNumber,
+  parseUnit,
+  getReturnUnit,
+  spellOutUnit,
   convert
 };
