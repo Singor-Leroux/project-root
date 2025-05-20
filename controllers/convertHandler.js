@@ -1,36 +1,102 @@
+// controllers/convertHandler.js
+
 function ConvertHandler() {
-  // ... (vos autres méthodes : getNum, getUnit, getReturnUnit, convert) ...
+
+  this.getNum = function (input) {
+    let num;
+    const firstCharIndex = input.search(/[a-zA-Z]/);
+    let numStr = (firstCharIndex === -1) ? input : input.substring(0, firstCharIndex);
+
+    if (numStr === "") {
+      return 1;
+    }
+
+    if (numStr.includes('/')) {
+      const parts = numStr.split('/');
+      if (parts.length > 2) {
+        return null; // Double fraction
+      }
+      const numerator = parseFloat(parts[0]);
+      const denominator = parseFloat(parts[1]);
+      if (isNaN(numerator) || isNaN(denominator) || denominator === 0) {
+        return null; // Fraction invalide
+      }
+      num = numerator / denominator;
+    } else {
+      num = parseFloat(numStr);
+    }
+
+    return isNaN(num) ? null : num;
+  };
+
+  this.getUnit = function (input) {
+    const validUnits = ['gal', 'l', 'mi', 'km', 'lbs', 'kg'];
+    const firstCharIndex = input.search(/[a-zA-Z]/);
+    if (firstCharIndex === -1) {
+      return null;
+    }
+    let unitStr = input.substring(firstCharIndex).toLowerCase();
+
+    if (unitStr === 'l') {
+      return 'L'; // Exigence FCC : Litre en majuscule 'L'
+    }
+
+    return validUnits.includes(unitStr) ? unitStr : null;
+  };
+
+  this.getReturnUnit = function (initUnit) {
+    const unit = initUnit.toLowerCase(); // Toujours comparer en minuscules
+    switch (unit) {
+      case 'gal': return 'L';    // Exigence FCC : Litre retourné en 'L'
+      case 'l': return 'gal';
+      case 'lbs': return 'kg';
+      case 'kg': return 'lbs';
+      case 'mi': return 'km';
+      case 'km': return 'mi';
+      default: return null;
+    }
+  };
 
   this.spellOutUnit = function (unit) {
     const unitLower = unit.toLowerCase();
     switch (unitLower) {
       case 'gal': return 'gallons';
-      case 'l': return 'litres'; // Assurez-vous que c'est 'litres' et non 'liter' si FCC l'attend
+      case 'l': return 'litres';        // Orthographe anglaise correcte
       case 'lbs': return 'pounds';
-      case 'kg': return 'kilograms';
+      case 'kg': return 'kilograms';     // Orthographe anglaise correcte
       case 'mi': return 'miles';
-      case 'km': return 'kilometers'; // Assurez-vous que c'est 'kilometers' et non 'kilomete...'
-      default: return null; // ou une chaîne d'erreur appropriée si nécessaire
+      case 'km': return 'kilometers';   // Orthographe anglaise correcte et complète
+      default: return 'unknown unit'; // Sécurité, ne devrait pas être atteint si la logique est correcte
     }
+  };
+
+  this.convert = function (initNum, initUnit) {
+    const galToL = 3.78541;
+    const lbsToKg = 0.453592;
+    const miToKm = 1.60934;
+    let result;
+    const unit = initUnit.toLowerCase();
+
+    switch (unit) {
+      case 'gal': result = initNum * galToL; break;
+      case 'l': result = initNum / galToL; break;
+      case 'lbs': result = initNum * lbsToKg; break;
+      case 'kg': result = initNum / lbsToKg; break;
+      case 'mi': result = initNum * miToKm; break;
+      case 'km': result = initNum / miToKm; break;
+      default: return null;
+    }
+    return parseFloat(result.toFixed(5)); // Arrondi à 5 décimales
   };
 
   this.getString = function (initNum, initUnit, returnNum, returnUnit) {
     const initUnitStr = this.spellOutUnit(initUnit);
     const returnUnitStr = this.spellOutUnit(returnUnit);
 
-    // Si l'une des unités épelées est nulle (parce que l'unité d'entrée/retour était invalide en premier lieu),
-    // cela ne devrait pas arriver ici si les vérifications précédentes sont correctes,
-    // mais par sécurité :
-    if (!initUnitStr || !returnUnitStr) {
-        // Cette situation ne devrait pas se produire si initUnit et returnUnit sont valides
-        // au moment où cette fonction est appelée.
-        // Normalement, les erreurs d'unité sont interceptées plus tôt.
-        return "Error in spelling out units"; // Ou null, selon la gestion d'erreur souhaitée
-    }
-
-    // C'EST LA LIGNE CRUCIALE POUR L'ERREUR DE LANGUE
+    // !! CORRECTION CRUCIALE POUR LA LANGUE ET L'ORTHOGRAPHE !!
     return `${initNum} ${initUnitStr} converts to ${returnNum} ${returnUnitStr}`;
   };
+
 }
 
 module.exports = ConvertHandler;
