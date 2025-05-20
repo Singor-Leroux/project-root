@@ -90,12 +90,13 @@ function ConvertHandler() {
     return parseFloat(result.toFixed(5));
   };
 
-  this.getString = function (initNum, initUnit, returnNum, returnUnit) {
-    const initUnitStr = this.spellOutUnit(initUnit);
-    const returnUnitStr = this.spellOutUnit(returnUnit);
-    if (!initUnitStr || !returnUnitStr) return null; // Si une unité n'est pas valide
-    return `${initNum} ${initUnitStr} convertit en ${returnNum} ${returnUnitStr}`;
-  };
+this.getString = function (initNum, initUnit, returnNum, returnUnit) {
+  const initUnitStr = this.spellOutUnit(initUnit);
+  const returnUnitStr = this.spellOutUnit(returnUnit);
+  if (!initUnitStr || !returnUnitStr) return null;
+  // Changer "convertit en" par "converts to"
+  return `${initNum} ${initUnitStr} converts to ${returnNum} ${returnUnitStr}`;
+};
 
 }
 

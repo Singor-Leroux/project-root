@@ -26,42 +26,41 @@ suite('Functional Tests', function () {
           });
       });
 
-      test('Convert 32g (invalid input unit)', function (done) {
-        chai.request(server)
-          .get('/api/convert')
-          .query({ input: '32g' })
-          .end(function (err, res) {
-            assert.equal(res.status, 200); // FCC attend 200 même pour les erreurs logiques
-            assert.deepEqual(res.body, { error: 'invalid unit' });
-            // Alternative si votre API renvoie une chaîne simple pour l'erreur :
-            // assert.equal(res.text, 'invalid unit');
-            done();
-          });
-      });
+test('Convert 32g (invalid input unit)', function (done) {
+  chai.request(server)
+    .get('/api/convert')
+    .query({ input: '32g' })
+    .end(function (err, res) {
+      assert.equal(res.status, 200); // FCC s'attend souvent à 200 même pour les erreurs d'application
+      // assert.deepEqual(res.body, { error: 'invalid unit' }); // ANCIENNE VERSION si vous renvoyiez JSON
+      assert.equal(res.text, 'invalid unit'); // NOUVELLE VERSION pour correspondre à res.send('invalid unit')
+      done();
+    });
+});
 
-      test('Convert 3/7.2/4kg (invalid number)', function (done) {
-        chai.request(server)
-          .get('/api/convert')
-          .query({ input: '3/7.2/4kg' })
-          .end(function (err, res) {
-            assert.equal(res.status, 200);
-            assert.deepEqual(res.body, { error: 'invalid number' });
-            // assert.equal(res.text, 'invalid number');
-            done();
-          });
-      });
+test('Convert 3/7.2/4kg (invalid number)', function (done) {
+  chai.request(server)
+    .get('/api/convert')
+    .query({ input: '3/7.2/4kg' })
+    .end(function (err, res) {
+      assert.equal(res.status, 200);
+      // assert.deepEqual(res.body, { error: 'invalid number' }); // ANCIENNE VERSION
+      assert.equal(res.text, 'invalid number'); // NOUVELLE VERSION
+      done();
+    });
+});
 
-      test('Convert 3/7.2/4kilomegagram (invalid number and unit)', function (done) {
-        chai.request(server)
-          .get('/api/convert')
-          .query({ input: '3/7.2/4kilomegagram' })
-          .end(function (err, res) {
-            assert.equal(res.status, 200);
-            assert.deepEqual(res.body, { error: 'invalid number and unit' });
-            // assert.equal(res.text, 'invalid number and unit');
-            done();
-          });
-      });
+test('Convert 3/7.2/4kilomegagram (invalid number and unit)', function (done) {
+  chai.request(server)
+    .get('/api/convert')
+    .query({ input: '3/7.2/4kilomegagram' })
+    .end(function (err, res) {
+      assert.equal(res.status, 200);
+      // assert.deepEqual(res.body, { error: 'invalid number and unit' }); // ANCIENNE VERSION
+      assert.equal(res.text, 'invalid number and unit'); // NOUVELLE VERSION
+      done();
+    });
+});
 
       test('Convert kg (no number)', function (done) {
         chai.request(server)
