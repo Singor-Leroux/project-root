@@ -66,8 +66,14 @@ function convertNew(input) {
   const initNum = parseNumber(input);
   const initUnit = parseUnit(input);
 
-  const numberError = initNum === null;
-  const unitError = initUnit === null;
+if (initNum === 'invalid number' && initUnit === 'invalid unit') {
+  return { error: 'invalid number and unit' };
+} else if (initNum === 'invalid number') {
+  return { error: 'invalid number' };
+} else if (initUnit === 'invalid unit') {
+  return { error: 'invalid unit' };
+}
+
 
   if (numberError && unitError) {
     return { error: 'invalid number and unit' };
@@ -96,5 +102,6 @@ module.exports = {
   parseUnit,
   getReturnUnit,
   spellOutUnit,
+  convertNew,
   convert
 };
