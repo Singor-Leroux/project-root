@@ -66,27 +66,29 @@ function convertNew(input) {
   const initNum = parseNumber(input);
   const initUnit = parseUnit(input);
 
-if (initNum === 'invalid number' && initUnit === 'invalid unit') {
-  return { error: 'invalid number and unit' };
-} else if (initNum === 'invalid number') {
-  return { error: 'invalid number' };
-} else if (initUnit === 'invalid unit') {
-  return { error: 'invalid unit' };
-}
+  if (initNum === 'invalid number' && initUnit === 'invalid unit') {
+    return { error: 'invalid number and unit' };
+  } else if (initNum === 'invalid number') {
+    return { error: 'invalid number' };
+  } else if (initUnit === 'invalid unit') {
+    return { error: 'invalid unit' };
+  }
 
   const returnNum = roundNum(convert(initNum, initUnit));
   const returnUnit = getReturnUnit(initUnit);
-  const initUnitString = spellOutUnit(initUnit);
-  const returnUnitString = spellOutUnit(returnUnit);
+
+  const normalizedInitUnit = initUnit === 'L' ? 'L' : initUnit.toLowerCase();
+  const normalizedReturnUnit = returnUnit === 'L' ? 'L' : returnUnit.toLowerCase();
 
   return {
     initNum,
-    initUnit,
+    initUnit: normalizedInitUnit,
     returnNum,
-    returnUnit,
-    string: `${initNum} ${initUnitString} converts to ${returnNum} ${returnUnitString}`
+    returnUnit: normalizedReturnUnit,
+    string: `${initNum} ${spellOutUnit(initUnit)} converts to ${returnNum} ${spellOutUnit(returnUnit)}`
   };
 }
+
 
 module.exports = {
   parseNumber,
